@@ -20,6 +20,8 @@ module Postal
         request_options[:json] = parameters(message, :flat => false).to_json
       when 'FormData'
         request_options[:params] = parameters(message, :flat => true)
+      when 'SendgridCompatibleBodyAsJson'
+        request_options[:params] = parameters_sendgrid(message)
       end
 
       log "Sending request to #{@endpoint.url}"
@@ -127,6 +129,23 @@ module Postal
       else
         {}
       end
+    end
+
+    def parameters_sendgrid(message, options = {})
+      {
+        :email => Base64.encode64(message.raw_message),
+        :to => message.rcpt_to,
+        :from => message.mail_from,
+        :envelope => {
+          to: message.rcpt_to,
+          from: message.mail_from
+        }.to_json,
+        :charsets => {
+          :to => "UTF-8",
+          :subject => "UTF-8",
+          :from => "UTF-8"
+        },
+      }
     end
 
   end

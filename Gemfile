@@ -22,7 +22,9 @@ gem 'basic_ssl'
 gem 'clockwork'
 gem 'encrypto_signo'
 gem 'nio4r'
-gem 'sentry-raven'
+gem "sentry-ruby"
+gem "sentry-rails"
+gem "sentry-sidekiq"
 gem 'gelf'
 gem 'moonrope'
 gem 'jwt'

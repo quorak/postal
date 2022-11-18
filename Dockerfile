@@ -1,15 +1,6 @@
-FROM ruby:2.6-buster AS base
+FROM ruby:2.7.6-slim-bullseye AS base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-  software-properties-common dirmngr apt-transport-https \
-  && apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc' \
-  && add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mirrors.xtom.nl/mariadb/repo/10.6/debian buster main' \
-  && (curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -) \
-  && (echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list) \
-  && (curl -sL https://deb.nodesource.com/setup_12.x | bash -) \
-  && rm -rf /var/lib/apt/lists/*
 
 # Install main dependencies
 RUN apt-get update && \
@@ -17,11 +8,13 @@ RUN apt-get update && \
   build-essential  \
   netcat \
   curl \
-  libmariadbclient-dev \
+  libmariadbclient-dev-compat \
   nano \
-  nodejs
+  git-core \
+  nodejs \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/ruby
+# RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/ruby
 
 # Configure 'postal' to work everywhere (when the binary exists
 # later in this process)
@@ -38,7 +31,7 @@ RUN mkdir -p /opt/postal/app /opt/postal/config
 WORKDIR /opt/postal/app
 
 # Install bundler
-RUN gem install bundler -v 2.1.4 --no-doc
+RUN gem install bundler -v 2.3.26 --no-doc
 
 # Install the latest and active gem dependencies and re-run
 # the appropriate commands to handle installs.

@@ -2,7 +2,7 @@ require 'postal/config'
 
 if Postal.config.general&.exception_url
   require 'raven'
-  Raven.configure do |config|
+  Sentry.init do |config|
     config.dsn = Postal.config.general.exception_url
     config.environments = ['production']
     if ENV['DEV_EXCEPTIONS']
